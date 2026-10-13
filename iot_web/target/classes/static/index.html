@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>IoT Monitor</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div id="login" class="login">
+        <form id="loginForm">
+            <h1>IoT Monitor</h1>
+
+            <input
+                id="user"
+                placeholder="Username"
+                required
+            >
+
+            <input
+                id="pass"
+                type="password"
+                placeholder="Password"
+                required
+            >
+
+            <button>Đăng nhập</button>
+
+            <p id="err"></p>
+
+            <small>Demo: admin / admin123</small>
+        </form>
+    </div>
+
+    <div id="app" class="app hidden">
+
+        <aside>
+            <b>IoT Monitor</b>
+
+            <nav>
+                <a data-page="dashboard">Dashboard</a>
+                <a data-page="datasensor">Data Sensor</a>
+                <a data-page="history">History</a>
+                <a data-page="profile">Profile</a>
+            </nav>
+
+            <button id="logout">Logout</button>
+        </aside>
+
+        <main>
+
+            <header>
+                <div>
+                    <h1 id="title"></h1>
+                    <span id="who"></span>
+                </div>
+
+            </header>
+
+            <!-- Dashboard -->
+            <section id="dashboard" class="page">
+
+                <div class="cards">
+
+                    <div class="card">
+                        <small>Temperature</small>
+                        <strong id="temp">--</strong> °C
+                    </div>
+
+                    <div class="card">
+                        <small>Humidity</small>
+                        <strong id="hum">--</strong> %
+                    </div>
+
+                    <div class="card">
+                        <small>Light</small>
+                        <strong id="light">--</strong> ADC
+                    </div>
+
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h2>15 giá trị gần nhất</h2>
+                        <canvas id="chart"></canvas>
+                    </div>
+
+                    <div class="card">
+                        <h2>Điều khiển LED</h2>
+                        <div id="leds"></div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Sensor data -->
+            <!-- Sensor data -->
+            <section
+                id="datasensor"
+                class="page hidden"
+            >
+                <div class="card">
+
+                    <div class="toolbar">
+
+                        <input
+                            id="stime"
+                            placeholder="dd/MM/yyyy hoặc HH:mm[:ss] dd/MM/yyyy"
+                            maxlength="19"
+                            style="min-width:300px"
+                        >
+
+                        <button id="ssearch">
+                            Search
+                        </button>
+
+                        <button id="ssort">
+                            Mới nhất
+                        </button>
+
+                        <label class="page-size">
+                            Số dòng/trang:
+                            <input
+                                id="spagesize"
+                                type="number"
+                                min="1"
+                                value="10"
+                            >
+                        </label>
+
+                    </div>
+
+                    <div class="table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+
+                                    <th class="filter-header">
+                                        <span>Loại cảm biến</span>
+
+                                        <button
+                                            class="filter-button"
+                                            id="sensorTypeFilterButton"
+                                            type="button"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+                                                />
+                                            </svg>
+                                        </button>
+
+                                        <div
+                                            class="filter-menu hidden"
+                                            id="sensorTypeFilterMenu"
+                                        >
+                                            <button data-value="">
+                                                Tất cả
+                                            </button>
+
+                                            <button data-value="temperature">
+                                                temperature
+                                            </button>
+
+                                            <button data-value="humidity">
+                                                humidity
+                                            </button>
+
+                                            <button data-value="light">
+                                                light
+                                            </button>
+                                        </div>
+                                    </th>
+
+                                    <th>Giá trị</th>
+                                    <th>Đơn vị</th>
+                                    <th>Thời gian</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="sbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+
+                        <button id="sprev">
+                            ←
+                        </button>
+
+                        <span id="spageinfo">
+                            Trang 1 / 1
+                        </span>
+
+                        <button id="snext">
+                            →
+                        </button>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- Control history -->
+            <!-- Control history -->
+            <section
+                id="history"
+                class="page hidden"
+            >
+                <div class="card">
+
+                    <div class="toolbar">
+
+                        <input
+                            id="htime"
+                            placeholder="dd/MM/yyyy hoặc HH:mm[:ss] dd/MM/yyyy"
+                            maxlength="19"
+                            style="min-width:300px"
+                        >
+
+                        <button id="hsearch">
+                            Search
+                        </button>
+
+                        <button id="hsort">
+                            Mới nhất
+                        </button>
+
+                        <label class="page-size">
+                            Số dòng/trang:
+                            <input
+                                id="hpagesize"
+                                type="number"
+                                min="1"
+                                value="10"
+                            >
+                        </label>
+
+                    </div>
+
+                    <div class="table">
+                        <table>
+
+                            <thead>
+                                <tr>
+
+                                    <th>ID</th>
+
+                                    <!-- DEVICE -->
+                                    <th class="filter-header">
+
+                                        <span>Thiết bị</span>
+
+                                        <button
+                                            class="filter-button"
+                                            id="deviceFilterButton"
+                                            type="button"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+                                                />
+                                            </svg>
+                                        </button>
+
+                                        <div
+                                            class="filter-menu hidden"
+                                            id="deviceFilterMenu"
+                                        >
+                                            <button data-value="">
+                                                Tất cả
+                                            </button>
+
+                                            <button data-value="LED01">
+                                                LED 1
+                                            </button>
+
+                                            <button data-value="LED02">
+                                                LED 2
+                                            </button>
+                                        </div>
+
+                                    </th>
+
+                                    <!-- ACTION -->
+                                    <th class="filter-header">
+
+                                        <span>Action</span>
+
+                                        <button
+                                            class="filter-button"
+                                            id="actionFilterButton"
+                                            type="button"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M3 5h18l-7 8v5l-4 2v5l-4 2v-7L3 5z"
+                                                />
+                                            </svg>
+                                        </button>
+
+                                        <div
+                                            class="filter-menu hidden"
+                                            id="actionFilterMenu"
+                                        >
+                                            <button data-value="">
+                                                Tất cả
+                                            </button>
+
+                                            <button data-value="ON">
+                                                ON
+                                            </button>
+
+                                            <button data-value="OFF">
+                                                OFF
+                                            </button>
+                                        </div>
+
+                                    </th>
+
+                                    <!-- STATUS -->
+                                    <th class="filter-header">
+
+                                        <span>Status</span>
+
+                                        <button
+                                            class="filter-button"
+                                            id="statusFilterButton"
+                                            type="button"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M3 5h18l-7 8v5l-4 2v-7L3 5z"
+                                                />
+                                            </svg>
+                                        </button>
+
+                                        <div
+                                            class="filter-menu hidden"
+                                            id="statusFilterMenu"
+                                        >
+                                            <button data-value="">
+                                                Tất cả
+                                            </button>
+
+                                            <button data-value="PENDING">
+                                                PENDING
+                                            </button>
+
+                                            <button data-value="SUCCESS">
+                                                SUCCESS
+                                            </button>
+
+                                            <button data-value="FAIL">
+                                                FAIL
+                                            </button>
+                                        </div>
+
+                                    </th>
+
+                                    <th>Time</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody id="hbody"></tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+
+                        <button id="hprev">
+                            ←
+                        </button>
+
+                        <span id="hpageinfo">
+                            Trang 1 / 1
+                        </span>
+
+                        <button id="hnext">
+                            →
+                        </button>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Profile -->
+            <section
+                id="profile"
+                class="page hidden"
+            >
+                <div class="card profile-card">
+
+                    <img
+                        src="/profile.jpg"
+                        class="profile-image"
+                        alt="Nguyễn Quang Minh"
+                    >
+
+                    <h2>Nguyễn Quang Minh</h2>
+
+
+                    <div class="profile-links">
+
+                        <div class="profile-link">
+                            <b>GitHub:</b>
+                            <a
+                                href="https://github.com/minhnqk5/IoT"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >https://github.com/minhnqk5/IoT</a>
+                        </div>
+
+                        <div class="profile-link">
+                            <b>Figma:</b>
+                            <a
+                                href="https://www.figma.com/design/xYql2UUqvCOWuFXX81uI2v/IoT_interface?node-id=2-22&t=Iu2djaXuCCcqKjzC-1"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >https://www.figma.com/design/xYql2UUqvCOWuFXX81uI2v/IoT_interface?node-id=2-22&amp;t=Iu2djaXuCCcqKjzC-1</a>
+                        </div>
+
+                        <div class="profile-link">
+                            <b>Báo cáo:</b>
+                            <a
+                                href="/IoT-Bai_1.pdf"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >/IoT-Bai_1.pdf</a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
