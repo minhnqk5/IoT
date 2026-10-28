@@ -302,6 +302,7 @@ function readSearch(prefix, timeOnly = false) {
     .value.trim()
     .replace(/\s+/g, " ");
 
+  // Nếu search giá trị ở Datasensor 
   if (!timeOnly && field !== "time") {
     return { field, text, time: "" };
   }
@@ -313,6 +314,7 @@ function readSearch(prefix, timeOnly = false) {
     return null;
   }
 
+  //Nếu search thời gian
   return { field: timeOnly ? field : "", text: "", time: text };
 }
 
@@ -377,45 +379,56 @@ async function dashboard() {
 // CHART
 // ======================================================
 
+
 function renderChart(rows) {
   const sensorTypes = ["temperature", "humidity", "light"];
 
-  const sets = sensorTypes.map((type) => ({
-    label: type,
-
-    data: rows
-      .filter((row) => row.sensorType === type)
-      .slice()
-      .reverse()
-      .map((row) => row.value),
-
-    tension: 0,
-  }));
-
+  //15 mốc thời gian
   const labels = rows
     .filter((row) => row.sensorType === "temperature")
     .slice()
     .reverse()
     .map((row) => time(row.createdAt));
+  
+  //15 mốc dữ liệu của từng loại cảm biến
+  const sets = sensorTypes.map((type) => ({
+    label: type,
+    data: rows
+      .filter((row) => row.sensorType === type)
+      .slice()
+      .reverse()
+      .map((row) => row.value),
+    tension: 0,
+  }));
 
-  if (chart) {
-    chart.destroy();
+  // Lần đầu: tạo biểu đồ
+  if (!chart) {
+    chart = new Chart($("chart"), {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: sets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+      },
+    });
+
+    return;
   }
 
-  chart = new Chart($("chart"), {
-    type: "line",
+  // Những lần sau: chỉ cập nhật dữ liệu biểu đồ cũ
+  chart.data.labels = labels;
 
-    data: {
-      labels,
-      datasets: sets,
-    },
-
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
+  chart.data.datasets.forEach((dataset, index) => {
+    dataset.data = sets[index].data;
   });
+
+  chart.update("none");
 }
+;
 
 // ======================================================
 // HIỂN THỊ LED

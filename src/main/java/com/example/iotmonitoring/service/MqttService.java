@@ -53,6 +53,7 @@ public class MqttService {
         private final HistoryRepository historyRepo;
         private final ObjectMapper mapper;
 
+        // MQTT client ở đây là chỉ chương trình backend nối tới broker mqtt
         private MqttClient client;
 
         public MqttService(
@@ -89,10 +90,10 @@ public class MqttService {
                         //Neu mat mang bao loi
                         @Override
                         public void connectionLost(Throwable throwable) {
-                        System.err.println(
-                                "MQTT connection lost: " +
-                                throwable.getMessage()
-                        );
+                                System.err.println(
+                                        "MQTT connection lost: " +
+                                        throwable.getMessage()
+                                );
                         }
 
                         //Neu Backend pub message thi ko xu ly gi
@@ -107,10 +108,10 @@ public class MqttService {
                                 MqttMessage message
                         ) {
                                 //ham handle o duoi
-                        handle(
-                                topic,
-                                new String(message.getPayload())
-                        );
+                                handle(
+                                        topic,
+                                        new String(message.getPayload())
+                                );
                         }
                 });
 
@@ -122,9 +123,9 @@ public class MqttService {
                 System.out.println("MQTT connected: " + broker);
 
                 } catch (Exception e) {
-                System.err.println(
-                        "MQTT unavailable: " + e.getMessage()
-                );
+                        System.err.println(
+                                "MQTT unavailable: " + e.getMessage()
+                        );
                 }
         }
 
@@ -228,6 +229,7 @@ public class MqttService {
                 return;
                 }
 
+                //Thêm loại cảm biến nếu chưa có
                 Sensor sensor = sensorRepo
                         .findBySensorTypeIgnoreCase(type)
                         .orElseGet(() ->
@@ -240,6 +242,7 @@ public class MqttService {
                                 )
                         );
 
+                //lưu datasensor 
                 dataSensorRepo.save(
                         new DataSensor(
                                 null,
